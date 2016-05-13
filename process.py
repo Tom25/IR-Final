@@ -1,3 +1,16 @@
+##
+# process.py
+#
+# This program runs over the pre-compiled transcripts in the Speeches directory
+# for each of the candidates we chose. These transcripts all come from the
+# official Democratic debates held during the 2016 primary election. This
+# program then allows users to search the transcripts for each candidate by
+# topic, thus allowing users to see excerpts from each candidate's responses
+# where they spoke about the given topic. The goal of this project is to help
+# voters become better informed on each candidate's stance on various issues
+# of importance to them.
+#
+
 from math import sqrt
 import string
 import os
@@ -18,6 +31,7 @@ def initialize_topic_vectors():
 	topics_file = open("topics_terms.txt", "r")
 	topic = None  # current topic in file iteration
 
+	# Loop through each line in the topics terms file.
 	for line in topics_file:
 		line = line.strip()
 		if line.startswith("T: "):
@@ -26,15 +40,23 @@ def initialize_topic_vectors():
 			topic_vectors[topic] = {}  # initialize new term vector for topic
 		elif line == "":
 			continue
-		# Add term to the current topic's term vector
 
+		# Add term to the current topic's term vector with a weight of one
 		topic_vectors[topic][line] = 1
 
+# Initialize document vectors for each document that is specified in the Speeches
+# directory for each candidate. For our purposes, by "document" we mean each line
+# in the transcript of a debate for a particular candidate. This usually means that
+# each document for a candidate ends up being their answer to a particular question
+# in the debate, or their response to another candidate's answer.
 def initialize_document_vectors():
+	# Loop over each candidate
 	for cand_name in cand_names:
+		# Loop over each debate transcript file available for this candidate
 		for subdir, dirs, files in os.walk("./Speeches/" + cand_name):
 			for file in files:
 				f = open("./Speeches/" + cand_name + "/" + file, "r")
+				# Loop over each line in this debate transcript file
 				for line in f:
 					doc = line.strip()
 					# Store original text of document at same index as doc vector
@@ -53,6 +75,7 @@ def initialize_document_vectors():
 					# Add to document vectors list for this candidate
 					doc_vectors[cand_name].append(doc_vector)
 
+# Compute and return the cosine similarity between two term vectors.
 def cosine_sim(vec1, vec2):
 	num     = 0
 	sum_sq1 = 0
@@ -89,25 +112,34 @@ def cosine_sim(vec1, vec2):
 		return 0
 	return num / sqrt(sum_mult);
 
+# Computes similarities between the given topic vector and the document
+# vector for the given candidate, then uses a priority queue to store the
+# top num_results documents based on cosine similarity. Returns a list
+# of the document IDs that are in the top num_results documents.
 def compute_similarities(topic_vector, num_results, cand_name):
 	pqueue = Queue.PriorityQueue()
+
+	# Loop over list of document vectors for the given candidate, performing
+	# cosine similarity between each of these documents' vectors and the given
+	# topic vector.
 	for i in range(len(doc_vectors[cand_name])):
 		doc_vector = doc_vectors[cand_name][i]
 		sim = cosine_sim(topic_vector, doc_vector)
-		# Put negative of similarity into pqueue because we want it to sort
-		# such that the greatest similarity is at the top
+		# Put the negative of similarity into pqueue because we want it to sort
+		# such that the greatest similarity is at the front/top of the queue.
 		pqueue.put((-sim, i))
 
-	# Fetch top num_results docs
+	# Fetch the top num_results docs and store their IDs for returning.
 	return_list = []
 	for i in range(num_results):
 		return_list.append(pqueue.get())
 
 	return return_list
 
+# Build a topic vector out of a string containing space-separated topic keywords.
 def build_topic_vector(line):
 	topic_vector = {}
-	terms = line.split()
+	terms = line.split()  # split input string at each space character
 	for term in terms:
 		if term in topic_vector:
 			topic_vector[term] += 1
@@ -116,6 +148,7 @@ def build_topic_vector(line):
 
 	return topic_vector
 
+# Print the results for a search query.
 def print_results(results, cand_name, topic):
 	print("-" * 50)
 	print("Top " + str(len(results)) + " results for " + cand_name)
@@ -123,7 +156,7 @@ def print_results(results, cand_name, topic):
 	print("-" * 50)
 	print("")
 
-	# Print each result and the document text to go with it
+	# Print each result and the document text to go with it.
 	for i in range(len(results)):
 		result_heading = "EXCERPT #" + str(i + 1) + ":"
 		print(result_heading)
@@ -133,6 +166,7 @@ def print_results(results, cand_name, topic):
 
 	print("")
 
+# Generate the main menu interface and contains main loop.
 def main():
 	initialize_topic_vectors()
 	initialize_document_vectors()
@@ -170,7 +204,7 @@ Enter 'q' to quit program.
 				cand_name = cand_names[0]
 				break
 			elif opt == "2":
-				cand_name == cand_names[1]
+				cand_name = cand_names[1]
 				break
 			elif opt.lower() == "q":
 				# Quit program
@@ -231,18 +265,19 @@ Select the type of topic you want to search by:""")
 			# User wants to specify a custom topic
 			while True:
 				print("""
-Please type a list of relevant terms defining your topic, each separated by a space.
-Keywords: """)
+Please type a list of relevant terms defining your topic, each separated by a space.""")
+				sys.stdout.write("Keywords: ")
 
 				opt = sys.stdin.readline().strip()
 				# Generate a vector with the given topic keywords
 				topic_vector = build_topic_vector(opt)
 				topic_name   = opt
+				break
 
 		# Ask user for max number of results to return
 		num_results = None
 		while True:
-			sys.stdout.write("Number of results to be reported: ")
+			sys.stdout.write("\nNumber of results to be reported: ")
 
 			# Cast option to integer
 			try:
@@ -263,4 +298,5 @@ Keywords: """)
 		results = compute_similarities(topic_vector, num_results, cand_name)
 		print_results(results, cand_name, topic_name)
 
+# Call main function to begin main loop for program.
 main()
