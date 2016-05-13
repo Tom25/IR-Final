@@ -1,16 +1,76 @@
 T: infrastructure
 bridges
 roads
+water
+pollution
+crumbling
+services
+poisioning
+poisioned
+resources
+teachers
 
-T: Wall Street
-big banks
-corporate greed
+T: college affordability
+college
+colleges
+education
+public
+tuition
+university
+universities
+student
+debt
+debt-free
+degree
+
+T: healthcare
+health
+care
+insurance
+universal
+Medicare
+prescription
+premiums
+drug
+
+T: corporate greed
+banks
+corporate
+greed
 bailout
+Wall
+Street
 
-T: gun violence
-assault weapon
+T: wealth inequality
+wealth
+inequality
+middle
+class
+millionaire
+millionaires
+billionaire
+billionaires
+unemployment
+wage
+wages
+income
+rigged
+
+T: gun control
 NRA
-gun control
+gun
+guns
+control
+violence
+murder
+kill
+killing
+weapon
+weapons
+tragedy
+assault
+gunmakers
+ammunition
 
 T: immigration
 citizenship
@@ -18,3 +78,10 @@ border
 visa
 H-1B
 H1B
+refugee
+undocumented
+deportation
+deported
+guest-worker
+guestworker
+guestworkers

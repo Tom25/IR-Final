@@ -150,9 +150,10 @@ def build_topic_vector(line):
 
 # Print the results for a search query.
 def print_results(results, cand_name, topic):
+	print("")
 	print("-" * 50)
 	print("Top " + str(len(results)) + " results for " + cand_name)
-	print("  TOPIC: " + topic)
+	print("  TOPIC: " + topic.title())
 	print("-" * 50)
 	print("")
 
